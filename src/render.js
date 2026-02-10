@@ -113,7 +113,7 @@ export function pageShop({ catalog, filters, cartQty }) {
             <div class="glow"></div>
             <div class="holo"></div>
             <div class="card__top">
-              <span class="badge num">#${escapeHtml(p.id.split('-')[0].slice(0,2).toUpperCase())}</span>
+              <span class="badge num">#${escapeHtml(p.shortCode || p.id.slice(0,2).toUpperCase())}</span>
               <span class="badge ${badgeClass(p.badge?.kind || p.badge?.label)}">${escapeHtml(p.badge?.label || 'POWER-UP')}</span>
             </div>
             <img class="card__img" src="${escapeHtml(p.images.card)}" alt="${escapeHtml(p.name)}" />
@@ -149,7 +149,7 @@ export function pageProduct({ product, selections, qty }) {
         <div class="glow" style="opacity:.9"></div>
         <div class="holo"></div>
         <div class="card__top">
-          <span class="badge num">#${escapeHtml(product.id.split('-')[0].slice(0,2).toUpperCase())}</span>
+          <span class="badge num">#${escapeHtml(product.shortCode || product.id.slice(0,2).toUpperCase())}</span>
           <span class="badge ${badgeClass(product.badge?.kind || product.badge?.label)}">${escapeHtml(product.badge?.label || 'POWER-UP')}</span>
         </div>
         <img class="card__img" src="${escapeHtml(product.images.hero)}" alt="${escapeHtml(product.name)}" />
