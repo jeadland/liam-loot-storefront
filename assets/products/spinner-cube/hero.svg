@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38D26B" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#38E8FF" stop-opacity="0.18"/>
+    </linearGradient>
+    <pattern id="pix" width="18" height="18" patternUnits="userSpaceOnUse">
+      <path d="M0 0h18v18H0z" fill="#0C1224"/>
+      <path d="M0 0h18" stroke="#ffffff" stroke-opacity="0.08"/>
+      <path d="M0 0v18" stroke="#ffffff" stroke-opacity="0.08"/>
+    </pattern>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#pix)"/>
+  <rect width="800" height="450" fill="url(#g)"/>
+
+  <g transform="translate(400 235)">
+    <rect x="-160" y="-160" width="320" height="320" rx="26" fill="#121B33" stroke="#B98CFF" stroke-opacity="0.50" stroke-width="8"/>
+    <rect x="-118" y="-118" width="236" height="236" rx="22" fill="#070A12" fill-opacity="0.35" stroke="#ffffff" stroke-opacity="0.10" stroke-width="3"/>
+
+    <g fill="#38E8FF" fill-opacity="0.45">
+      <rect x="-70" y="-10" width="140" height="20" rx="8"/>
+      <rect x="-10" y="-70" width="20" height="140" rx="8"/>
+    </g>
+
+    <circle r="26" fill="#FFD24A"/>
+  </g>
+</svg>

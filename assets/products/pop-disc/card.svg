@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B98CFF" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#FF4D6D" stop-opacity="0.14"/>
+    </linearGradient>
+    <pattern id="pix" width="18" height="18" patternUnits="userSpaceOnUse">
+      <path d="M0 0h18v18H0z" fill="#0C1224"/>
+      <path d="M0 0h18" stroke="#ffffff" stroke-opacity="0.08"/>
+      <path d="M0 0v18" stroke="#ffffff" stroke-opacity="0.08"/>
+    </pattern>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#pix)"/>
+  <rect width="800" height="450" fill="url(#g)"/>
+
+  <g transform="translate(400 230)">
+    <circle r="140" fill="#121B33" stroke="#B98CFF" stroke-opacity="0.55" stroke-width="8"/>
+    <circle r="104" fill="#070A12" fill-opacity="0.35" stroke="#ffffff" stroke-opacity="0.10" stroke-width="3"/>
+    <g fill="#38E8FF" fill-opacity="0.45">
+      <circle cx="-48" cy="-24" r="18"/>
+      <circle cx="48" cy="-24" r="18"/>
+      <circle cx="-48" cy="44" r="18"/>
+      <circle cx="48" cy="44" r="18"/>
+    </g>
+    <circle r="22" fill="#FFD24A"/>
+  </g>
+
+  <g font-family="Inter, system-ui" fill="#EAF2FF">
+    <text x="26" y="52" font-size="22" font-weight="800">Pop Disc</text>
+    <text x="26" y="80" font-size="14" opacity="0.8">Quiet pops. Big focus. Boss-level calm.</text>
+  </g>
+
+  <g font-family="'Press Start 2P', system-ui" fill="#B98CFF">
+    <text x="26" y="422" font-size="12">LEGEND</text>
+  </g>
+</svg>

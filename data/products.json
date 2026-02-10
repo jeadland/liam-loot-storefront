@@ -1,0 +1,94 @@
+{
+  "currency": "USD",
+  "shop": {
+    "title": "Liam’s Loot",
+    "tagline": "Pick a fidget. Level up recess.",
+    "finePrint": "Pickup at school • Venmo or Zelle • If you yeet it into the hallway, that’s on you."
+  },
+  "payment": {
+    "venmoHandle": "@LIAM-LOOT",
+    "zelleTarget": "liam@example.com",
+    "noteFormat": "{ORDER_CODE} - Liam Loot - {FIRST_NAME}"
+  },
+  "products": [
+    {
+      "id": "spinner-cube",
+      "name": "Spinner Cube",
+      "price": 3,
+      "badge": { "kind": "bestSeller", "label": "BEST SELLER" },
+      "tags": ["rare", "clicky", "pocket"],
+      "description": "Chunky spin + click. Feels like a tiny controller.",
+      "images": {
+        "card": "/assets/products/spinner-cube/card.svg",
+        "hero": "/assets/products/spinner-cube/hero.svg"
+      },
+      "statsLine": "Spin: FAST • Click: MED • Pocket: YES",
+      "options": [
+        {
+          "id": "color",
+          "name": "Choose your power-up color",
+          "type": "swatch",
+          "required": true,
+          "values": [
+            { "id": "creeper-green", "label": "Creeper Green", "swatch": "#38D26B" },
+            { "id": "diamond-blue", "label": "Diamond Blue", "swatch": "#38E8FF" },
+            { "id": "redstone-pink", "label": "Redstone Pink", "swatch": "#FF4D6D" },
+            { "id": "amethyst", "label": "Amethyst", "swatch": "#B98CFF" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "twist-snake",
+      "name": "Twist Snake",
+      "price": 2,
+      "badge": { "kind": "new", "label": "NEW" },
+      "tags": ["common", "twisty", "quiet"],
+      "description": "Twist it into anything. Pickaxe? Dragon? Yup.",
+      "images": {
+        "card": "/assets/products/twist-snake/card.svg",
+        "hero": "/assets/products/twist-snake/hero.svg"
+      },
+      "statsLine": "Bend: HIGH • Quiet: MED • Pocket: YES",
+      "options": [
+        {
+          "id": "color",
+          "name": "Choose your power-up color",
+          "type": "swatch",
+          "required": true,
+          "values": [
+            { "id": "grass-ink", "label": "Grass + Ink", "swatch": "linear-gradient(135deg,#38D26B,#0C1224)" },
+            { "id": "gold-rush", "label": "Gold Rush", "swatch": "#FFD24A" },
+            { "id": "ocean", "label": "Ocean", "swatch": "#38E8FF" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pop-disc",
+      "name": "Pop Disc",
+      "price": 4,
+      "badge": { "kind": "legend", "label": "LEGEND" },
+      "tags": ["legend", "poppy", "focus"],
+      "description": "Tiny pops. Big focus. Boss-level calm.",
+      "images": {
+        "card": "/assets/products/pop-disc/card.svg",
+        "hero": "/assets/products/pop-disc/hero.svg"
+      },
+      "statsLine": "Pop: SNAPPY • Quiet: HIGH • Focus: +10",
+      "options": [
+        {
+          "id": "color",
+          "name": "Choose your power-up color",
+          "type": "swatch",
+          "required": true,
+          "values": [
+            { "id": "diamond", "label": "Diamond", "swatch": "#38E8FF" },
+            { "id": "redstone", "label": "Redstone", "swatch": "#FF4D6D" },
+            { "id": "amethyst", "label": "Amethyst", "swatch": "#B98CFF" }
+          ]
+        }
+      ]
+    }
+  ]
+}
