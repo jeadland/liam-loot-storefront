@@ -32,22 +32,58 @@ function burstAtCart() {
   const x = rect.left + rect.width * 0.75;
   const y = rect.top + rect.height * 0.35;
 
-  for (let i = 0; i < 8; i++) {
+  const colors = ['var(--diamond)', 'var(--amethyst)', 'var(--gold)', 'var(--grass)'];
+
+  for (let i = 0; i < 12; i++) {
     const b = document.createElement('div');
     b.className = 'burst';
     b.style.left = x + 'px';
     b.style.top = y + 'px';
-    b.style.background = i % 2 ? 'var(--diamond)' : 'var(--amethyst)';
+    b.style.background = colors[i % colors.length];
     document.body.appendChild(b);
 
-    const dx = (Math.random() * 2 - 1) * 40;
-    const dy = (Math.random() * 2 - 1) * 35 - 10;
+    const angle = (Math.PI * 2 * i) / 12;
+    const velocity = 50 + Math.random() * 30;
+    const dx = Math.cos(angle) * velocity;
+    const dy = Math.sin(angle) * velocity - 15;
 
     b.animate([
-      { transform: 'translate(0,0) scale(1)', opacity: 1 },
-      { transform: `translate(${dx}px,${dy}px) scale(.8)`, opacity: .9 },
-      { transform: `translate(${dx * 1.2}px,${dy * 1.2}px) scale(.2)`, opacity: 0 }
-    ], { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' }).onfinish = () => b.remove();
+      { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 },
+      { transform: `translate(${dx * 0.6}px,${dy * 0.6}px) scale(1.1) rotate(180deg)`, opacity: 1, offset: 0.3 },
+      { transform: `translate(${dx}px,${dy + 40}px) scale(0.3) rotate(360deg)`, opacity: 0 }
+    ], {
+      duration: 650,
+      easing: 'cubic-bezier(.2,.8,.3,1)'
+    }).onfinish = () => b.remove();
+  }
+}
+
+function confettiBlast(x, y) {
+  const colors = ['var(--diamond)', 'var(--amethyst)', 'var(--gold)', 'var(--grass)', 'var(--redstone)'];
+  const shapes = ['square', 'circle'];
+
+  for (let i = 0; i < 30; i++) {
+    const c = document.createElement('div');
+    c.className = `confetti ${shapes[Math.floor(Math.random() * shapes.length)]}`;
+    c.style.left = x + 'px';
+    c.style.top = y + 'px';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    document.body.appendChild(c);
+
+    const angle = (Math.PI * 2 * Math.random());
+    const velocity = 80 + Math.random() * 100;
+    const dx = Math.cos(angle) * velocity;
+    const dy = Math.sin(angle) * velocity - 50;
+    const rotation = Math.random() * 720 - 360;
+
+    c.animate([
+      { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 },
+      { transform: `translate(${dx * 0.5}px,${dy * 0.5}px) scale(1.2) rotate(${rotation * 0.5}deg)`, opacity: 1, offset: 0.25 },
+      { transform: `translate(${dx}px,${dy + 100}px) scale(0.4) rotate(${rotation}deg)`, opacity: 0 }
+    ], {
+      duration: 800 + Math.random() * 400,
+      easing: 'cubic-bezier(.25,.8,.25,1)'
+    }).onfinish = () => c.remove();
   }
 }
 
@@ -329,6 +365,15 @@ function render() {
       location.hash = '#/shop';
     });
 
+    // Trigger victory confetti
+    const banner = app.querySelector('[data-confetti]');
+    if (banner) {
+      const rect = banner.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      setTimeout(() => confettiBlast(centerX, centerY), 150);
+    }
+
     updateCartUI();
     return;
   }
@@ -337,7 +382,35 @@ function render() {
     app.innerHTML = pageCraft();
     const btn = app.querySelector('[data-craft-submit]');
     if (btn) btn.addEventListener('click', () => {
+      const name = document.querySelector('#cName')?.value || '';
+      const where = document.querySelector('#cWhere')?.value || '';
+      const req = document.querySelector('#cReq')?.value || '';
+
+      if (!name.trim() || !req.trim()) {
+        showToast('NOPE', 'Name and request are required.');
+        return;
+      }
+
+      // Save craft request
+      const craftRequest = {
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        name: name.trim(),
+        classTeacher: where.trim(),
+        request: req.trim(),
+        status: 'Requested'
+      };
+
+      const prev = JSON.parse(localStorage.getItem('ll_crafts') || '[]');
+      prev.push(craftRequest);
+      localStorage.setItem('ll_crafts', JSON.stringify(prev));
+
       showToast('CRAFT!', 'Request saved. Talk to Liam at school.');
+
+      // Clear form
+      document.querySelector('#cName').value = '';
+      document.querySelector('#cWhere').value = '';
+      document.querySelector('#cReq').value = '';
     });
     updateCartUI();
     return;

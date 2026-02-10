@@ -9,6 +9,50 @@ const badgeClass = (kind) => {
   return 'rare';
 };
 
+const parseStats = (statsLine) => {
+  if (!statsLine) return [];
+  // Parse "Spin: FAST • Click: MED • Pocket: YES" format
+  const parts = statsLine.split('•').map(s => s.trim());
+  const stats = [];
+  const valueMap = {
+    'FAST': 90, 'HIGH': 85, 'MED': 60, 'MEDIUM': 60, 'LOW': 35,
+    'SNAPPY': 85, 'YES': 95, 'NO': 10, '+10': 100
+  };
+
+  for (const part of parts) {
+    const [label, val] = part.split(':').map(s => s.trim());
+    if (label && val) {
+      const percent = valueMap[val.toUpperCase()] || 50;
+      stats.push({ label, value: percent });
+    }
+  }
+  return stats;
+};
+
+const getAchievements = () => {
+  const orders = JSON.parse(localStorage.getItem('ll_orders') || '[]');
+  const orderCount = orders.length;
+  const achievements = [];
+
+  if (orderCount === 1) {
+    achievements.push({ label: 'FIRST LOOT', class: 'new', icon: 'trophy' });
+  }
+  if (orderCount >= 3) {
+    achievements.push({ label: 'COLLECTOR', class: 'rare', icon: 'chest' });
+  }
+  if (orderCount >= 5) {
+    achievements.push({ label: 'POWER PLAYER', class: 'bestSeller', icon: 'trophy' });
+  }
+  if (orderCount >= 10) {
+    achievements.push({ label: 'LEGEND', class: 'legend', icon: 'trophy' });
+  }
+
+  // Always show the current order badge
+  achievements.unshift({ label: `+1 ORDER`, class: 'bestSeller', icon: 'check' });
+
+  return achievements;
+};
+
 export function pageShop({ catalog, filters, cartQty }) {
   const { shop } = catalog;
   const chips = [
@@ -61,9 +105,11 @@ export function pageShop({ catalog, filters, cartQty }) {
     </div>
 
     <div class="grid inv" style="margin-top:16px;">
-      ${catalog.products.map(p => `
+      ${catalog.products.map(p => {
+        const isLegend = badgeClass(p.badge?.kind || p.badge?.label) === 'legend';
+        return `
         <div class="inv-slot">
-          <a class="card" href="#/product/${p.id}" data-open="${p.id}">
+          <a class="card ${isLegend ? 'enchanted' : ''}" href="#/product/${p.id}" data-open="${p.id}">
             <div class="glow"></div>
             <div class="holo"></div>
             <div class="card__top">
@@ -82,7 +128,7 @@ export function pageShop({ catalog, filters, cartQty }) {
             </div>
           </a>
         </div>
-      `).join('')}
+      `}).join('')}
     </div>
   </section>
   `;
@@ -92,12 +138,14 @@ export function pageProduct({ product, selections, qty }) {
   const opt = (product.options || [])[0];
   const values = opt?.values || [];
   const selected = values.find(v => v.id === selections[opt?.id]) || values[0];
+  const stats = parseStats(product.statsLine);
+  const isLegend = badgeClass(product.badge?.kind || product.badge?.label) === 'legend';
 
   return `
   <section class="split" style="margin-top:18px;">
     <div class="panel pixel-grid"><div class="panel__inner">
       <div class="px" style="font-size:10px;color:var(--diamond);margin-bottom:8px;">TRADING CARD VIEW</div>
-      <div class="card">
+      <div class="card ${isLegend ? 'enchanted' : ''}">
         <div class="glow" style="opacity:.9"></div>
         <div class="holo"></div>
         <div class="card__top">
@@ -109,7 +157,14 @@ export function pageProduct({ product, selections, qty }) {
           <div class="card__name">${escapeHtml(product.name)}</div>
           <p class="card__desc">${escapeHtml(product.description)}</p>
           <div class="divider"></div>
-          <div class="micro"><b>Stats:</b> ${escapeHtml(product.statsLine || '')}</div>
+          <div class="px" style="font-size:9px;color:var(--muted);margin-bottom:10px;">POWER-UP STATS</div>
+          ${stats.map(st => `
+            <div class="stat-bar">
+              <div class="stat-bar__label">${escapeHtml(st.label.toUpperCase())}</div>
+              <div class="stat-bar__track"><div class="stat-bar__fill" style="width:${st.value}%"></div></div>
+              <div class="stat-bar__value">${st.value}</div>
+            </div>
+          `).join('')}
         </div>
         <div class="card__bot">
           <div class="price">$${product.price}</div>
@@ -231,11 +286,26 @@ export function pageCheckout({ total, values, payment }) {
   <section class="split" style="margin-top:18px;">
     <div class="panel"><div class="panel__inner">
       <div class="px" style="font-size:10px;color:var(--diamond);margin-bottom:8px;">QUEST TRACKER</div>
-      <div class="row" style="justify-content:space-between;">
-        <span class="badge bestSeller">CART</span>
-        <span class="badge rare">DETAILS</span>
-        <span class="badge">PAY</span>
-        <span class="badge">CONFIRM</span>
+      <div class="quest-tracker">
+        <div class="quest-step completed">
+          <div class="quest-step__circle"><svg class="ico"><use href="#i-check"></use></svg></div>
+          <div class="quest-step__label">CART</div>
+          <div class="quest-step__line"></div>
+        </div>
+        <div class="quest-step active">
+          <div class="quest-step__circle">2</div>
+          <div class="quest-step__label">DETAILS</div>
+          <div class="quest-step__line"></div>
+        </div>
+        <div class="quest-step">
+          <div class="quest-step__circle">3</div>
+          <div class="quest-step__label">PAY</div>
+          <div class="quest-step__line"></div>
+        </div>
+        <div class="quest-step">
+          <div class="quest-step__circle">4</div>
+          <div class="quest-step__label">DONE</div>
+        </div>
       </div>
       <div class="divider"></div>
 
@@ -293,13 +363,19 @@ export function pageConfirm({ orderCode, paymentMethod, payment, values }) {
 
   const to = paymentMethod === 'Venmo' ? payment.venmoHandle : payment.zelleTarget;
   const methodWord = paymentMethod === 'Venmo' ? 'Venmo' : 'Zelle';
+  const achievements = getAchievements();
+  const xp = achievements.length * 10;
 
   return `
   <section class="split" style="margin-top:18px;">
     <div class="panel pixel-grid"><div class="panel__inner">
-      <div class="badge legend" style="display:inline-block;">QUEST COMPLETE</div>
-      <h1 class="h1" style="margin-top:14px;">Order requested!</h1>
-      <p class="sub">Order code: <b>${escapeHtml(orderCode)}</b></p>
+      <div class="victory-banner" data-confetti>
+        <div class="badge legend" style="display:inline-block;margin-bottom:12px;">
+          <svg class="ico"><use href="#i-trophy"></use></svg> QUEST COMPLETE
+        </div>
+        <h1 class="h1" style="margin:12px 0;font-size:28px;text-shadow:0 0 24px rgba(255,210,74,.35);">VICTORY!</h1>
+        <p class="sub" style="margin:0;font-size:16px;">Order code: <b style="color:var(--gold);font-size:20px;">${escapeHtml(orderCode)}</b></p>
+      </div>
 
       <div class="divider"></div>
       <div class="px" style="font-size:10px;color:var(--diamond);margin-bottom:8px;">PAYMENT INSTRUCTIONS</div>
@@ -311,11 +387,26 @@ export function pageConfirm({ orderCode, paymentMethod, payment, values }) {
 
       <div class="divider"></div>
       <div class="px" style="font-size:10px;color:var(--diamond);margin-bottom:8px;">QUEST TRACKER</div>
-      <div class="micro">
-        <div class="row"><span class="badge rare">REQUESTED</span> <svg class="ico" style="color:var(--grass)"><use href="#i-check"></use></svg></div>
-        <div class="row"><span class="badge">PAID</span> <span class="micro">(after payment)</span></div>
-        <div class="row"><span class="badge">CRAFTING</span></div>
-        <div class="row"><span class="badge">DELIVERED</span></div>
+      <div class="quest-tracker">
+        <div class="quest-step completed">
+          <div class="quest-step__circle"><svg class="ico"><use href="#i-check"></use></svg></div>
+          <div class="quest-step__label">REQUEST</div>
+          <div class="quest-step__line"></div>
+        </div>
+        <div class="quest-step active">
+          <div class="quest-step__circle">2</div>
+          <div class="quest-step__label">PAY</div>
+          <div class="quest-step__line"></div>
+        </div>
+        <div class="quest-step">
+          <div class="quest-step__circle">3</div>
+          <div class="quest-step__label">CRAFT</div>
+          <div class="quest-step__line"></div>
+        </div>
+        <div class="quest-step">
+          <div class="quest-step__circle">4</div>
+          <div class="quest-step__label">DELIVER</div>
+        </div>
       </div>
 
       <div class="divider"></div>
@@ -323,11 +414,28 @@ export function pageConfirm({ orderCode, paymentMethod, payment, values }) {
     </div></div>
 
     <div class="panel"><div class="panel__inner">
-      <div class="px" style="font-size:10px;color:var(--diamond);margin-bottom:8px;">REWARDS</div>
-      <div class="row">
-        <span class="badge bestSeller">+1 FOCUS BUFF</span>
-        <span class="badge rare">+3 SPIN SKILL</span>
-        <span class="badge new">+2 CHILL</span>
+      <div class="px" style="font-size:10px;color:var(--diamond);margin-bottom:14px;">REWARDS UNLOCKED</div>
+      <div class="row" style="margin-bottom:16px;gap:8px;">
+        ${achievements.map(ach => `
+          <span class="badge ${ach.class}"><svg class="ico"><use href="#i-${ach.icon}"></use></svg> ${escapeHtml(ach.label)}</span>
+        `).join('')}
+        <span class="badge rare">+${xp} XP</span>
+      </div>
+      <div class="px" style="font-size:10px;color:var(--diamond);margin-bottom:8px;">POWER-UP STATS</div>
+      <div class="stat-bar">
+        <div class="stat-bar__label">FOCUS</div>
+        <div class="stat-bar__track"><div class="stat-bar__fill" style="width:85%"></div></div>
+        <div class="stat-bar__value">+8</div>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-bar__label">CHILL</div>
+        <div class="stat-bar__track"><div class="stat-bar__fill" style="width:70%"></div></div>
+        <div class="stat-bar__value">+7</div>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-bar__label">VIBES</div>
+        <div class="stat-bar__track"><div class="stat-bar__fill" style="width:95%"></div></div>
+        <div class="stat-bar__value">+9</div>
       </div>
       <div class="divider"></div>
       <div class="micro"><b>Delivery</b><br>
